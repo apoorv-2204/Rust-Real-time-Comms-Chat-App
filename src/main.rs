@@ -21,9 +21,15 @@ struct RTCResponse {
     #[field(validate = len(..50))]
     pub room: String,
     #[field(validate = len(..20))]
-    pub user_name: String,
+    pub username: String,
     #[field(validate = len(..301))]
     pub message: String,
+}
+
+#[post("/response", data = "<form>")]
+fn post(form: Form<RTCResponse>, queue: &State<Sender<RTCResponse>>) {
+    // sending will fail if no one is listening
+    let _res = queue.send(form.into_inner());
 }
 
 #[get("/events")]
@@ -43,12 +49,6 @@ async fn events(queue: &State<Sender<RTCResponse>>, mut end: Shutdown) -> EventS
             yield Event::json(&msg);
         }
     }
-}
-
-#[post("/response", data = "<form>")]
-fn post(form: Form<RTCResponse>, queue: &State<Sender<RTCResponse>>) {
-    // sending will fail if no one is listening
-    let _res = queue.send(form.into_inner());
 }
 
 #[launch]

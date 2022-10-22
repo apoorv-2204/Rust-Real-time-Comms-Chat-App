@@ -12,7 +12,7 @@ let usernameField = newMessageForm.querySelector("#username");
 let roomNameField = newRoomForm.querySelector("#name");
 
 var STATE = {
-  room: "lobby",
+  room: "Main_Lobby",
   rooms: {},
   connected: false,
 }
@@ -28,8 +28,7 @@ function hashColor(str) {
   return `hsl(${hash % 360}, 100%, 70%)`;
 }
 
-// Add a new room `name` and change to it. Returns `true` if the room didn't
-// already exist and false otherwise.
+// create room,  true if room already exists, false otherwise
 function addRoom(name) {
   if (STATE[name]) {
     changeRoom(name);
@@ -127,11 +126,11 @@ function setConnectedStatus(status) {
 // Let's go! Initialize the world.
 function init() {
   // Initialize some rooms.
-  addRoom("lobby");
-  addRoom("rocket");
-  changeRoom("lobby");
-  addMessage("lobby", "Rocket", "Hey! Open another browser tab, send a message.", true);
-  addMessage("rocket", "Rocket", "This is another room. Neat, huh?", true);
+  addRoom("Main_Lobby");
+  // addRoom("rocket");
+  changeRoom("Main_Lobby");
+  addMessage("Main_Lobby", "Chat-Sever", "New Messages will appear here, You can add a room from LHS", true);
+  // addMessage("rocket", "Rocket", "This is another room. Neat, huh?", true);
 
   // Set up the form handler.
   newMessageForm.addEventListener("submit", (e) => {
@@ -143,7 +142,7 @@ function init() {
     if (!message || !username) return;
 
     if (STATE.connected) {
-      fetch("/message", {
+      fetch("/response", {
         method: "POST",
         body: new URLSearchParams({ room, username, message }),
       }).then((response) => {
@@ -162,7 +161,7 @@ function init() {
     roomNameField.value = "";
     if (!addRoom(room)) return;
 
-    addMessage(room, "Rocket", `Look, your own "${room}" room! Nice.`, true);
+    addMessage(room, "Chat Server", `This room was created by you. "${room}" `, true);
   })
 
   // Subscribe to server-sent events.
